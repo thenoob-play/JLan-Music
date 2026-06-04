@@ -1,44 +1,97 @@
-const audio = document.getElementById("audio-player");
-const progressBar = document.getElementById("progress-bar");
-const currentTimeEl = document.getElementById("current");
-const durationEl = document.getElementById("duration");
-const volume = document.getElementById("volume");
+const audioPlayer = document.getElementById("audio-player");
+const btnPlay = document.querySelector(".play");
+const songInfo = document.querySelector(".song");
 
-// 🔊 volumen
-volume.addEventListener("input", () => {
-    audio.volume = volume.value;
-});
+let lista = [];
+let indexActual = 0;
 
-// ▶️ play / pause
-function togglePlay() {
-    if (audio.paused) {
-        audio.play();
-    } else {
-        audio.pause();
+async function cargarTopCanciones() {
+    try {
+        const res = await fetch('/top-canciones');
+        const canciones = await res.json();
+
+        lista = canciones;
+
+        const contenedor = document.querySelector(".cards");
+        contenedor.innerHTML = "";
+
+        canciones.forEach((c, i) => {
+            const card = document.createElement("div");
+            card.className = "card-cancion";
+
+            card.innerHTML = `
+                <img src="${c.thumbnail}" style="width:100%">
+                <p>${c.titulo}</p>
+            `;
+
+            card.onclick = () => {
+                indexActual = i;
+                reproducir(c.url);
+            };
+
+            contenedor.appendChild(card);
+        });
+
+    } catch (e) {
+        console.error("ERROR CARGANDO:", e);
     }
 }
 
-// ⏱ FORMATO TIEMPO
-function formatTime(time) {
-    let minutes = Math.floor(time / 60);
-    let seconds = Math.floor(time % 60);
-    if (seconds < 10) seconds = "0" + seconds;
-    return `${minutes}:${seconds}`;
+cargarTopCanciones();
+
+
+// 🎧 REPRODUCIR
+async function reproducir(url) {
+    try {
+        const res = await fetch('/stream', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ url })
+        });
+
+        const data = await res.json();
+
+        if (data.audio_url) {
+            audioPlayer.src = data.audio_url;
+            audioPlayer.play();
+
+            songInfo.innerHTML = `<strong>${data.titulo}</strong>`;
+            btnPlay.textContent = "⏸";
+        } else {
+            alert("No se pudo reproducir");
+        }
+
+    } catch (e) {
+        console.error("ERROR:", e);
+        alert("No se pudo cargar el audio");
+    }
 }
 
-// 📊 cuando carga la canción
-audio.addEventListener("loadedmetadata", () => {
-    progressBar.max = Math.floor(audio.duration);
-    durationEl.textContent = formatTime(audio.duration);
+
+// ▶ / ⏸
+btnPlay.addEventListener("click", () => {
+    if (audioPlayer.paused) {
+        audioPlayer.play();
+        btnPlay.textContent = "⏸";
+    } else {
+        audioPlayer.pause();
+        btnPlay.textContent = "▶";
+    }
 });
 
-// 🔄 actualizar progreso
-audio.addEventListener("timeupdate", () => {
-    progressBar.value = Math.floor(audio.currentTime);
-    currentTimeEl.textContent = formatTime(audio.currentTime);
-});
 
-// 🎯 mover barra manualmente
-progressBar.addEventListener("input", () => {
-    audio.currentTime = progressBar.value;
-});
+// ⏭
+function nextSong() {
+    if (indexActual < lista.length - 1) {
+        indexActual++;
+        reproducir(lista[indexActual].url);
+    }
+}
+
+// ⏮
+function prevSong() {
+    if (indexActual > 0) {
+        indexActual--;
+        reproducir(lista[indexActual].url);
+    }
+}
