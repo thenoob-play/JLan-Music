@@ -1,5 +1,5 @@
 flask
 flask-cors
-yt-dlp
 gunicorn
+yt-dlp
 requests

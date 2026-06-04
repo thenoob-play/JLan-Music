@@ -49,29 +49,38 @@ def stream():
     url = data.get("url")
     if not url: return jsonify({"error": "No URL"}), 400
 
+    # Opciones actualizadas para mayor compatibilidad
     opciones = {
-        'format': 'bestaudio',
+        'format': 'bestaudio/best',  # Busca el mejor audio disponible sin forzar formato
         'quiet': True,
-        'extractor_args': {'youtube': {'player_client': ['android']}}
+        'no_warnings': True,
+        # Eliminamos el forzado de 'android' que está dando el error de formato
+        'user_agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
     }
 
     try:
         with yt_dlp.YoutubeDL(opciones) as ydl:
             info = ydl.extract_info(url, download=False)
-            audio_url = None
-            for f in info.get('formats', []):
-                if f.get('acodec') != 'none' and f.get('vcodec') == 'none':
-                    audio_url = f.get('url')
-                    break
             
-            if not audio_url: return jsonify({"error": "No audio"}), 500
+            # Buscamos la URL de audio más compatible
+            audio_url = None
+            if 'url' in info:
+                audio_url = info['url']
+            else:
+                for f in info.get('formats', []):
+                    if f.get('acodec') != 'none' and f.get('vcodec') == 'none':
+                        audio_url = f.get('url')
+                        break
+            
+            if not audio_url: 
+                return jsonify({"error": "No se encontró un formato de audio compatible"}), 500
 
-            # LA CLAVE: Enviar a nuestro propio proxy en lugar de a YouTube directamente
             return jsonify({
                 "audio_url": f"/proxy-audio?url={requests.utils.quote(audio_url)}",
                 "titulo": info.get("title")
             })
     except Exception as e:
+        print(f"Error en yt-dlp: {e}")
         return jsonify({"error": str(e)}), 500
 
 @app.route('/proxy-audio')
