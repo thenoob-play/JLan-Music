@@ -1,0 +1,282 @@
+/* --- 1. Estilos Globales y Variables --- */
+:root {
+    --sidebar-width: 280px;
+    --bg-main: #09090B;
+    --bg-sidebar: #0A0A0F;
+    --accent: #1aff8c;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: var(--bg-main);
+    color: #fff;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+/* --- 2. Estructura Principal (Layout) --- */
+.container {
+    display: flex;
+    flex: 1;
+}
+
+.sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: var(--sidebar-width);
+    height: 100vh;
+    background: var(--bg-sidebar);
+    padding: 20px;
+    box-sizing: border-box;
+    z-index: 100;
+    border-right: 1px solid #1f1f23;
+}
+
+.main {
+    margin-left: var(--sidebar-width);
+    flex: 1;
+    padding: 30px;
+    padding-bottom: 110px;
+}
+
+/* --- 3. Componentes Internos --- */
+.logo {
+    font-size: 24px;
+    margin-bottom: 30px;
+    text-align: left;
+}
+
+.search-box {
+    width: 100%;
+    margin-bottom: 25px;
+}
+
+.search-box input {
+    width: 100%;
+    padding: 12px 15px;
+    border-radius: 8px;
+    border: 1px solid #333;
+    background: #16161a;
+    color: white;
+    box-sizing: border-box;
+}
+
+.menu button,
+.library button {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    padding: 12px 15px;
+    margin-bottom: 8px;
+    background: transparent;
+    border: none;
+    color: #b3b3b3;
+    cursor: pointer;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    font-size: 16px;
+}
+
+.menu button:hover,
+.library button:hover {
+    background: #1f1f23;
+    color: #fff;
+}
+
+.menu button.active {
+    background: #1f1f23;
+    color: var(--accent);
+    font-weight: bold;
+}
+
+/* --- 4. Carrusel --- */
+/* --- 4. Carrusel --- */
+.carousel-container {
+    position: relative;
+    width: 100%;
+}
+
+.cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 20px;
+    padding: 20px 0;
+    width: 100%;
+}
+
+.card-cancion {
+    min-width: 180px;
+    max-width: 180px;
+    background: #181818;
+    padding: 15px;
+    border-radius: 10px;
+    transition: background 0.3s;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+.card-cancion:hover {
+    background: #282828;
+}
+
+
+.nav-btn:hover {
+    background: #3a3a3a;
+    transform: translateY(-50%) scale(1.1);
+}
+
+/* Solo mostrar el botón que tiene sentido según la posición del scroll */
+.nav-btn.visible {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.prev { left: -15px; }
+.next { right: -15px; }
+
+/* --- 5. Reproductor (Fijo abajo) --- */
+.player {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background: #000000;
+    padding: 10px;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between; /* 🔥 separa izquierda / centro / derecha */
+
+    z-index: 9999;
+}
+
+.song {
+    width: 25%;
+    text-align: left; /* 🔥 izquierda */
+}
+
+/* CONTROLES */
+.controls {
+    width: 50%;
+    display: flex;
+    justify-content: center; /* centro */
+}
+
+.volume {
+    width: 25%;
+    display: flex;
+    justify-content: flex-end; 
+    padding-right: 25px;
+}
+.controls button {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 18px;
+    margin: 0 5px;
+    cursor: pointer;
+}
+
+/* BARRA */
+.progress-container {
+    display: flex;
+    align-items: center;
+    width: 80%;
+    gap: 10px;
+}
+
+#progress-bar {
+    flex: 1;
+    appearance: none;
+    height: 5px;
+    background: #535353;
+    border-radius: 5px;
+    cursor: pointer;
+    
+}
+
+/* circulito */
+#progress-bar::-webkit-slider-thumb {
+    appearance: none;
+    width: 12px;
+    height: 12px;
+    background: #1db954;
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+/* TIEMPOS */
+#current,
+#duration {
+    font-size: 12px;
+    color: #b3b3b3;
+}
+
+
+/* 🔥 CONTENEDOR CENTRAL (botones + barra) */
+.center-player {
+    width: 50%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* CONTROLES ARRIBA */
+.controls {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 5px;
+}
+
+/* BARRA ABAJO */
+.progress-container {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    gap: 10px;
+}
+
+
+
+
+
+
+
+
+
+
+/* --- 6. RESPONSIVE (Móvil y Tablets) --- */
+@media (max-width: 768px) {
+    .container {
+        flex-direction: column;
+    }
+
+    .sidebar {
+        position: relative;
+        width: 100%;
+        height: auto;
+        border-right: none;
+        border-bottom: 1px solid #1f1f23;
+    }
+
+    .main {
+        margin-left: 0;
+        padding: 20px;
+    }
+
+    .player {
+        height: auto;
+        flex-direction: column;
+        padding: 15px;
+        gap: 10px;
+    }
+
+    .volume {
+        display: none;
+    }
+}

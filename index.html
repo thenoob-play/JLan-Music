@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>JLan</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+
+<div class="container">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+        <h1 class="logo">JLan</h1>
+
+        <nav class="menu">
+            <div class="search-box">
+                <input type="text" placeholder="Buscar...">                
+            </div>   
+
+            <button class="menu-btn active">Inicio</button>
+            <button class="menu-btn">Tu biblioteca</button>
+        </nav>
+
+        <div class="library">
+            <button>+ Crear playlist</button>
+            <button>❤ Canciones que te gustan</button>
+        </div>
+    </aside>
+
+    <!-- CONTENIDO -->
+    <main class="main">
+        <section id="seccion-inicio">
+            <h2>Buenos días</h2>
+            <p class="subtitle">Tu música favorita te espera</p>
+            <h3>Top canciones</h3>
+            <div class="carousel-container">
+                <div class="cards"></div>
+            </div>
+        </section>
+
+        <section id="seccion-biblioteca" style="display: none;">
+            <h2>Tu biblioteca</h2>
+            <p>Aquí deben estar las playlists.</p>
+        </section>
+    </main>
+
+</div>
+
+<!-- PLAYER -->
+<footer class="player">
+
+    <div class="song">
+        <span id="current-time">0:00</span>
+    </div>
+
+    <!-- 🔥 NUEVO CONTENEDOR -->
+    <div class="center-player">
+
+        <div class="controls">
+            <button>🔀</button>
+            <button onclick="prevSong()">⏮</button>
+            <button class="play" onclick="togglePlay()">▶</button>
+            <button onclick="nextSong()">⏭</button>
+            <button>🔁</button>
+        </div>
+
+        <div class="progress-container">
+            <span id="current">0:00</span>
+            <input type="range" id="progress-bar" value="0" step="1">
+            <span id="duration">0:00</span>
+        </div>
+
+    </div>
+
+    <div class="volume">
+        <input type="range" id="volume" min="0" max="1" step="0.1">
+    </div>
+
+</footer>
+
+<audio id="audio-player"></audio>
+
+<script src="js/script.js"></script>
+<script src="js/Buscador.js"></script>
+<script src="js/reproductor.js"></script>
+
+</body>
+</html>
