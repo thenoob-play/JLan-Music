@@ -1,9 +1,14 @@
-/* --- 1. Estilos Globales y Variables --- */
+/* --- 1. VARIABLES Y BASE --- */
 :root {
     --sidebar-width: 280px;
     --bg-main: #09090B;
     --bg-sidebar: #0A0A0F;
     --accent: #1aff8c;
+}
+
+* {
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
 }
 
 body {
@@ -15,70 +20,118 @@ body {
     display: flex;
     flex-direction: column;
     min-height: 100vh;
+    letter-spacing: 0.3px;
 }
 
-/* --- 2. Estructura Principal (Layout) --- */
+/* --- 2. LAYOUT --- */
 .container {
     display: flex;
     flex: 1;
 }
 
+/* SIDEBAR */
 .sidebar {
     position: fixed;
     top: 0;
     left: 0;
     width: var(--sidebar-width);
     height: 100vh;
-    background: var(--bg-sidebar);
     padding: 20px;
-    box-sizing: border-box;
-    z-index: 100;
+    background: rgba(10, 10, 15, 0.85);
+    backdrop-filter: blur(12px);
     border-right: 1px solid #1f1f23;
+    z-index: 100;
+    display: flex;
+    flex-direction: column;
 }
 
+/* TOP */
+.sidebar-top {
+    position: sticky;
+    top: 0;
+    padding-bottom: 25px;
+    z-index: 10;
+}
+
+/* SCROLL */
+.sidebar-scrollable {
+    flex: 1;
+    overflow-y: auto;
+    scrollbar-width: none;
+}
+.sidebar-scrollable::-webkit-scrollbar {
+    display: none;
+}
+
+/* MAIN */
 .main {
     margin-left: var(--sidebar-width);
     flex: 1;
-    padding: 30px;
-    padding-bottom: 110px;
+    padding: 20px 30px 120px;
 }
 
-/* --- 3. Componentes Internos --- */
+/* HEADER */
+.main-header {
+    position: sticky;
+    top: 0;
+    padding: 20px 0;
+    background: rgba(9, 9, 11, 0.85);
+    backdrop-filter: blur(12px);
+    z-index: 90;
+}
+
+/* --- 3. COMPONENTES --- */
 .logo {
     font-size: 24px;
-    margin-bottom: 30px;
-    text-align: left;
+    margin: 0;
+}
+.estadoVercion {
+    font-size: 10px;
+    margin: 0;
 }
 
+/* BUSCADOR */
 .search-box {
     width: 100%;
-    margin-bottom: 25px;
+    max-width: 400px;
+    position: relative;
 }
 
 .search-box input {
     width: 100%;
-    padding: 12px 15px;
-    border-radius: 8px;
-    border: 1px solid #333;
-    background: #16161a;
-    color: white;
-    box-sizing: border-box;
+    padding: 12px 16px 12px 40px;
+    border-radius: 30px;
+    border: 1px solid #222;
+    background: #121212;
+    color: #fff;
+    font-size: 13px;
+    outline: none;
+    transition: 0.3s;
 }
 
+.search-box input:focus {
+    box-shadow: 0 0 0 2px var(--accent);
+}
+
+.search-box input::placeholder {
+    color: #777;
+}
+
+/* BOTONES */
 .menu button,
 .library button {
     display: flex;
     align-items: center;
     width: 100%;
-    padding: 12px 15px;
+    padding: 10px 14px;
     margin-bottom: 8px;
-    background: transparent;
+    background: rgba(255,255,255,0.03);
     border: none;
     color: #b3b3b3;
     cursor: pointer;
-    border-radius: 8px;
-    transition: all 0.3s ease;
-    font-size: 16px;
+    border-radius: 20px;
+    transition: 0.2s;
+    font-size: 14px;
 }
 
 .menu button:hover,
@@ -88,195 +141,139 @@ body {
 }
 
 .menu button.active {
-    background: #1f1f23;
-    color: var(--accent);
+    background: var(--accent);
+    color: #000;
     font-weight: bold;
 }
 
-/* --- 4. Carrusel --- */
-/* --- 4. Carrusel --- */
-.carousel-container {
-    position: relative;
-    width: 100%;
-}
-
+/* --- 4. CARDS --- */
 .cards {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-    gap: 20px;
+    gap: 14px;
     padding: 20px 0;
-    width: 100%;
 }
 
 .card-cancion {
-    min-width: 180px;
-    max-width: 180px;
-    background: #181818;
-    padding: 15px;
-    border-radius: 10px;
-    transition: background 0.3s;
+    background: linear-gradient(145deg, #181818, #1f1f1f);
+    padding: 12px;
+    border-radius: 14px;
     cursor: pointer;
-    flex-shrink: 0;
+    transition: 0.25s;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
 }
 
 .card-cancion:hover {
-    background: #282828;
+    transform: scale(1.03);
+    background: #242424;
 }
 
-
-.nav-btn:hover {
-    background: #3a3a3a;
-    transform: translateY(-50%) scale(1.1);
-}
-
-/* Solo mostrar el botón que tiene sentido según la posición del scroll */
-.nav-btn.visible {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.prev { left: -15px; }
-.next { right: -15px; }
-
-/* --- 5. Reproductor (Fijo abajo) --- */
-.player {
-    position: fixed;
-    bottom: 0;
-    left: 0;
+.card-cancion img {
     width: 100%;
-    background: #000000;
-    padding: 10px;
-
-    display: flex;
-    align-items: center;
-    justify-content: space-between; /* 🔥 separa izquierda / centro / derecha */
-
-    z-index: 9999;
+    aspect-ratio: 1 / 1;
+    object-fit: cover;
+    border-radius: 12px;
 }
 
-.song {
-    width: 25%;
-    text-align: left; /* 🔥 izquierda */
+.card-cancion p {
+    font-size: 13px;
+    margin-top: 8px;
+    line-height: 1.3;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
 }
 
-/* CONTROLES */
-.controls {
-    width: 50%;
-    display: flex;
-    justify-content: center; /* centro */
-}
-
-.volume {
-    width: 25%;
-    display: flex;
-    justify-content: flex-end; 
-    padding-right: 25px;
-}
-.controls button {
-    background: none;
-    border: none;
-    color: white;
-    font-size: 18px;
-    margin: 0 5px;
-    cursor: pointer;
-}
-
-/* BARRA */
-.progress-container {
-    display: flex;
-    align-items: center;
-    width: 80%;
-    gap: 10px;
-}
-
-#progress-bar {
-    flex: 1;
-    appearance: none;
-    height: 5px;
-    background: #535353;
-    border-radius: 5px;
-    cursor: pointer;
-    
-}
-
-/* circulito */
-#progress-bar::-webkit-slider-thumb {
-    appearance: none;
-    width: 12px;
-    height: 12px;
-    background: #1db954;
-    border-radius: 50%;
-    cursor: pointer;
-}
-
-/* TIEMPOS */
-#current,
-#duration {
-    font-size: 12px;
-    color: #b3b3b3;
-}
-
-
-/* 🔥 CONTENEDOR CENTRAL (botones + barra) */
-.center-player {
-    width: 50%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
-
-/* CONTROLES ARRIBA */
-.controls {
-    display: flex;
-    justify-content: center;
-    margin-bottom: 5px;
-}
-
-/* BARRA ABAJO */
-.progress-container {
-    display: flex;
-    align-items: center;
-    width: 100%;
-    gap: 10px;
-}
-
-
-
-
-
-
-
-
-
-
-/* --- 6. RESPONSIVE (Móvil y Tablets) --- */
+/* --- 5. RESPONSIVE --- */
 @media (max-width: 768px) {
+
     .container {
         flex-direction: column;
     }
 
+    /* SIDEBAR MOBILE */
     .sidebar {
-        position: relative;
         width: 100%;
-        height: auto;
-        border-right: none;
+        height: 70px;
+        padding: 10px;
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
         border-bottom: 1px solid #1f1f23;
     }
 
+    .sidebar-top h6 {
+        display: none;
+    }
+
+    .sidebar-top h1 {
+        font-size: 18px;
+    }
+
+    .sidebar-scrollable {
+        display: flex;
+        flex-direction: row;
+        gap: 8px;
+        overflow-x: auto;
+        white-space: nowrap;
+    }
+
+    .menu, .library {
+        display: flex;
+        flex-direction: row;
+        gap: 6px;
+    }
+
+    .menu button,
+    .library button {
+        font-size: 12px;
+        padding: 6px 10px;
+        margin-bottom: 0;
+    }
+
+    /* HEADER MOBILE */
+    .main-header {
+        position: fixed;
+        top: 70px;
+        left: 0;
+        width: 100%;
+        padding: 10px 15px;
+        border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+
+    .search-box {
+        max-width: 100%;
+    }
+
+    /* MAIN MOBILE */
     .main {
         margin-left: 0;
-        padding: 20px;
+        padding: 20px 16px;
+        padding-top: 140px;
+        padding-bottom: 140px;
     }
 
-    .player {
-        height: auto;
-        flex-direction: column;
-        padding: 15px;
-        gap: 10px;
+    /* GRID MOBILE */
+    .cards, 
+    #contenedor-playlists, 
+    .cards-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 12px;
     }
 
-    .volume {
-        display: none;
+    .card-cancion {
+        padding: 10px;
+        border-radius: 12px;
+    }
+
+    .card-cancion p {
+        font-size: 12px;
+    }
+
+    /* MODAL */
+    .modal-content {
+        width: 90%;
+        max-width: 300px;
     }
 }

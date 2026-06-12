@@ -3,88 +3,192 @@
 <head>
     <meta charset="UTF-8">
     <title>JLan</title>
-    <link rel="stylesheet" href="/css/style.css">
+
+    <!-- 🔥 RESPONSIVE -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/diseñoReproductor.css">
+    <link rel="stylesheet" href="/css/diseñoCardsPlaylis.css">
 </head>
+
 <body>
 
 <div class="container">
 
-    <!-- SIDEBAR -->
+    
+
+    <!-- 🔥 SIDEBAR -->
     <aside class="sidebar">
-        <h1 class="logo">JLan</h1>
 
-        <nav class="menu">
-            <div class="search-box">
-                <input type="text" placeholder="Buscar...">                
-            </div>   
-
-            <button class="menu-btn active">Inicio</button>
-            <button class="menu-btn">Tu biblioteca</button>
-        </nav>
-
-        <div class="library">
-            <button>+ Crear playlist</button>
-            <button>❤ Canciones que te gustan</button>
+        <div class="sidebar-top">
+            <h1 class="logo">JLan</h1>
+            <h6 class="estadoVercion">beta</h6>
         </div>
+
+        <div class="sidebar-scrollable">
+
+            <!-- 🔥 MENU -->
+            <nav class="menu">
+                <button class="menu-btn active" data-seccion="inicio">Inicio</button>
+                <button class="menu-btn" data-seccion="biblioteca">Tu biblioteca</button>
+            </nav>
+
+            <!-- 🔥 LIBRERÍA -->
+            <div class="library">
+                <button id="btn-sidebar-crear">+ Crear playlist</button>
+                <button class="likeCanciones" data-seccion="likes">❤ Canciones que te gustan</button>
+            </div>
+
+        </div>
+
     </aside>
 
-    <!-- CONTENIDO -->
+
+    <!-- 🔥 CONTENIDO PRINCIPAL -->
     <main class="main">
-        <section id="seccion-inicio">
-            <h2>Buenos días</h2>
-            <p class="subtitle">Tu música favorita te espera</p>
-            <h3>Top canciones</h3>
-            <div class="carousel-container">
-                <div class="cards"></div>
+
+        <!-- 🔥 BUSCADOR -->
+        <header class="main-header">
+            <div class="search-box">
+                <input type="text" placeholder="Buscar...">
+            </div>
+        </header>
+
+
+        <!-- 🔥 SECCIÓN LIKES -->
+        <section id="seccion-likes" style="display: none;">
+            <h2>Canciones que te gustan</h2>
+            <p class="subtitle">Tu colección personal de favoritas</p>
+
+            <div class="grid-playlists">
+                <div class="cards-grid" id="contenedor-likes-canciones"></div>
             </div>
         </section>
 
-        <section id="seccion-biblioteca" style="display: none;">
-            <h2>Tu biblioteca</h2>
-            <p>Aquí deben estar las playlists.</p>
+
+        <!-- 🔥 INICIO -->
+        <section id="seccion-inicio">
+
+            <h2>Buenos días</h2>
+            <p class="subtitle">Tu música favorita te espera</p>
+
+            <h3>Top canciones</h3>
+            <div class="carousel-container">
+                <div class="cards" id="top-canciones"></div>
+            </div>
+
+            <h3>Tus playlists</h3>
+            <div class="tus_playlists">
+                <div class="cards" id="tus-playlists"></div>
+            </div>
+
         </section>
+
+
+        <!-- 🔥 BIBLIOTECA -->
+        <section id="seccion-biblioteca" style="display: none;">
+
+            <h2>Tu biblioteca</h2>
+            <p>Aquí estarán tus playlists.</p>
+
+            <button id="btn_canciones">
+                <span>+</span> Crear playlist
+            </button>
+
+            <div class="tus_playlists">
+                <div class="cards" id="contenedor-playlists"></div>
+            </div>
+
+        </section>
+
+
+        <!-- 🔥 MODAL CREAR PLAYLIST -->
+        <div id="modal-playlist" class="modal" style="display: none;">
+
+            <div class="modal-content">
+
+                <h3>Nueva Playlist</h3>
+                <p>¿Cómo se llamará tu playlist?</p>
+
+                <input 
+                    type="text" 
+                    id="nombre-playlist-input" 
+                    placeholder="Ej. Mis favoritas de rock"
+                    autocomplete="off"
+                >
+
+                <div class="modal-botones">
+                    <button id="btn-cancelar" class="btn-secundario">Cancelar</button>
+                    <button id="btn-guardar" class="btn-primario">Guardar</button>
+                </div>
+
+            </div>
+
+        </div>
+
     </main>
 
 </div>
 
-<!-- PLAYER -->
+
+<!-- 🔥 PLAYER -->
 <footer class="player">
 
     <div class="song">
         <span id="current-time">0:00</span>
     </div>
 
-    <!-- 🔥 NUEVO CONTENEDOR -->
     <div class="center-player">
 
         <div class="controls">
-            <button>🔀</button>
+            <button id="btn-like-reproductor">❤</button>
             <button onclick="prevSong()">⏮</button>
             <button class="play" onclick="togglePlay()">▶</button>
             <button onclick="nextSong()">⏭</button>
-            <button>🔁</button>
+            <button id="btn-agregar-reproductor">+</button>
         </div>
 
         <div class="progress-container">
             <span id="current">0:00</span>
-            <input type="range" id="progress-bar" value="0" step="1">
+
+            <input 
+                type="range" 
+                id="progress-bar" 
+                value="0" 
+                min="0" 
+                step="1"
+            >
+
             <span id="duration">0:00</span>
         </div>
 
     </div>
 
     <div class="volume">
-        <input type="range" id="volume" min="0" max="1" step="0.1">
+        <input 
+            type="range" 
+            id="volume" 
+            min="0" 
+            max="1" 
+            step="0.1"
+        >
     </div>
 
 </footer>
 
+
+<!-- 🔥 AUDIO -->
 <audio id="audio-player"></audio>
 
+
+<!-- 🔥 SCRIPTS -->
 <script src="js/script.js"></script>
 <script src="js/Buscador.js"></script>
 <script src="js/reproductor.js"></script>
+<script src="js/playlist.js"></script>
+<script src="js/crearPlaylist.js"></script>
 
 </body>
 </html>

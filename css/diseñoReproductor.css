@@ -1,0 +1,182 @@
+/* --- PLAYER MODERNO --- */
+.player {
+    position: fixed;
+    border: 1px solid rgba(255,255,255,0.05);
+    bottom: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 95%;
+    background: rgba(20, 20, 20, 0.85);
+    backdrop-filter: blur(15px);
+    border-radius: 20px;
+    padding: 12px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    z-index: 9999;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+}
+
+/* --- INFO CANCIÓN --- */
+.song {
+    width: 25%;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #fff;
+    font-size: 13px;
+    opacity: 0.8;
+}
+
+/* --- CENTRO --- */
+.center-player {
+    width: 50%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* --- CONTROLES --- */
+.controls {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 6px;
+}
+
+.controls button {
+    background: rgba(255,255,255,0.05);
+    border: none;
+    color: #fff;
+    font-size: 16px;
+    margin: 0 6px;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 50%;
+    transition: all 0.2s ease;
+}
+
+/* Hover elegante */
+.controls button:hover {
+    background: rgba(255,255,255,0.15);
+    transform: scale(1.1);
+}
+
+/* Botón PLAY destacado */
+.controls .play {
+    background: #1db954;
+    color: black;
+    font-size: 18px;
+    padding: 10px;
+}
+
+.controls .play:hover {
+    background: #1ed760;
+    transform: scale(1.15);
+}
+
+/* --- PROGRESS BAR --- */
+.progress-container {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    gap: 10px;
+}
+
+/* Barra base */
+#progress-bar {
+    flex: 1;
+    appearance: none;
+    height: 4px;
+    background: #444;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+/* Hover barra */
+#progress-bar:hover {
+    height: 6px;
+}
+
+/* Indicador */
+#progress-bar::-webkit-slider-thumb {
+    appearance: none;
+    width: 12px;
+    height: 12px;
+    background: #1db954;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+#progress-bar::-webkit-slider-thumb:hover {
+    transform: scale(1.2);
+}
+
+/* --- TIEMPOS --- */
+#current,
+#duration {
+    font-size: 11px;
+    color: #aaa;
+    min-width: 40px;
+    text-align: center;
+}
+
+/* --- VOLUMEN --- */
+.volume {
+    width: 25%;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 10px;
+}
+
+/* Barra volumen */
+#volume {
+    width: 100px;
+    appearance: none;
+    height: 4px;
+    background: #444;
+    border-radius: 10px;
+}
+
+#volume::-webkit-slider-thumb {
+    appearance: none;
+    width: 10px;
+    height: 10px;
+    background: #1db954;
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+
+
+@media (max-width: 768px) {
+
+    .player {
+        flex-direction: column;
+        align-items: center;
+        gap: 8px;
+        padding: 10px;
+        border-radius: 15px;
+    }
+
+    .song {
+        width: 100%;
+        justify-content: center;
+        font-size: 12px;
+    }
+
+    .center-player {
+        width: 100%;
+    }
+
+    .volume {
+        display: none;
+    }
+
+    .controls button {
+        font-size: 14px;
+        padding: 6px;
+    }
+}
