@@ -3,10 +3,21 @@ import requests
 from flask import Flask, request, jsonify, send_from_directory, Response
 from flask_cors import CORS
 import yt_dlp
-import mysql.connector  # <-- CORREGIDO: Importación real agregada
+
+# Intentamos importar mysql, si no está en Render no romperá la app
+try:
+    import mysql.connector
+    MYSQL_AVAILABLE = True
+except ImportError:
+    MYSQL_AVAILABLE = False
 
 app = Flask(__name__, static_folder='.', static_url_path='')
 CORS(app)
+
+# ================== ALMACENAMIENTO TEMPORAL (SIN BD) ==================
+# Si la base de datos falla o no está configurada, usaremos estas listas en memoria
+TEMPORAL_CANCIONES = []
+TEMPORAL_LIKES = []
 
 # ================== CONFIG ==================
 YDL_BASE_OPTS = {
@@ -17,9 +28,28 @@ YDL_BASE_OPTS = {
 REQUEST_TIMEOUT = 10
 
 
+# ================== CONEXIÓN A BASE DE DATOS (CORREGIDA) ==================
+def get_connection():
+    """
+    Intenta conectarse a MySQL local. Si falla (como en Render), 
+    devuelve None en lugar de romper la aplicación.
+    """
+    if not MYSQL_AVAILABLE:
+        return None
+        
+    try:
+        return mysql.connector.connect(
+            host="localhost",          
+            user="root",               
+            password="noobees07",  
+            database="jlan",
+            connect_timeout=2 # Evita que Render se quede colgado esperando
+        )
+    except Exception:
+        # Si no se puede conectar (estamos en Render), devolvemos None amigablemente
+        return None
 
 
-# ================== UTIL ==================
 def extraer_videos(info):
     return [{
         "id": v.get("id"),
@@ -159,6 +189,138 @@ def proxy_audio():
     except Exception as e:
         return error_response(f"Error en proxy: {str(e)}", 500)
 
+
+# ================== RELACIONADOS ==================
+@app.route('/relacionados', methods=['POST'])
+def relacionados():
+    data = request.get_json(silent=True)
+
+    if not data:
+        return error_response("Datos no proporcionados")
+
+    canal = data.get("canal")
+    titulo = data.get("titulo")
+
+    try:
+        if canal:
+            query = f"{canal}"
+        elif titulo:
+            palabras_evitar = ["official", "video", "lyrics", "audio", "hd"]
+            query = " ".join([
+                palabra for palabra in titulo.split()
+                if palabra.lower() not in palabras_evitar
+            ])
+        else:
+            return error_response("Falta título o canal")
+
+        opciones = {
+            **YDL_BASE_OPTS,
+            'extract_flat': True
+        }
+
+        with yt_dlp.YoutubeDL(opciones) as ydl:
+            info = ydl.extract_info(f"ytsearch30:{query}", download=False)
+
+        resultados_todos = extraer_videos(info)
+        
+        if canal:
+            canal_lower = canal.lower()
+            resultados_filtrados = [
+                v for v in resultados_todos 
+                if v.get("canal") and canal_lower in v.get("canal").lower()
+            ]
+            if not resultados_filtrados:
+                resultados_filtrados = resultados_todos
+        else:
+            resultados_filtrados = resultados_todos
+
+        resultados_finales = resultados_filtrados[:10]
+        return jsonify(resultados_finales)
+
+    except Exception as e:
+        return error_response(f"Error obteniendo relacionados: {str(e)}", 500)
+
+
+# ================== BASE DE DATOS (CON RESPALDO EN MEMORIA) ==================
+@app.route('/agregar-cancion', methods=['POST'])
+def agregar_cancion():
+    data = request.json
+    conexion = get_connection()
+
+    if conexion is None:
+        # MODO SIN BASE DE DATOS (Para Render)
+        TEMPORAL_CANCIONES.append(data)
+        return jsonify({"ok": True, "mensaje": "Guardado en memoria temporal (Modo sin Base de Datos)"})
+
+    try:
+        cursor = conexion.cursor()
+        cursor.execute("""
+            INSERT INTO cancion (direccion, orden, playlist_idplaylist, playlist_usuario_idusuario)
+            VALUES (%s, %s, %s, %s)
+        """, (
+            data["direccion"],               
+            data["orden"],                   
+            data["playlist_idplaylist"],     
+            data["playlist_usuario_idusuario"] 
+        ))
+        conexion.commit()
+        cursor.close()
+        conexion.close()
+        return jsonify({"ok": True, "mensaje": "Canción agregada correctamente en MySQL"})
+    except Exception as e:
+        return error_response(f"Error en la base de datos: {str(e)}", 500)
+
+
+@app.route('/like', methods=['POST'])
+def like():
+    data = request.json
+    conexion = get_connection()
+
+    if conexion is None:
+        # MODO SIN BASE DE DATOS (Para Render)
+        TEMPORAL_LIKES.append(data)
+        return jsonify({"ok": True, "mensaje": "Like guardado en memoria temporal (Modo sin Base de Datos)"})
+
+    try:
+        cursor = conexion.cursor()
+        cursor.execute("""
+            INSERT INTO like_cancion (direccion, usuario_idusuario)
+            VALUES (%s, %s)
+        """, (
+            data["direccion"],          
+            data["usuario_idusuario"]   
+        ))
+        conexion.commit()
+        cursor.close()
+        conexion.close()
+        return jsonify({"ok": True, "mensaje": "Like guardado correctamente en MySQL"})
+    except Exception as e:
+        return error_response(f"Error al registrar like: {str(e)}", 500)
+
+
+@app.route('/obtener-likes/<int:usuario_id>', methods=['GET'])
+def obtener_likes(usuario_id):
+    conexion = get_connection()
+
+    if conexion is None:
+        # MODO SIN BASE DE DATOS (Para Render)
+        direcciones = [like["direccion"] for like in TEMPORAL_LIKES if like.get("usuario_idusuario") == usuario_id]
+        return jsonify({"ok": True, "likes": direcciones, "nota": "Datos temporales"})
+
+    try:
+        cursor = conexion.cursor(dictionary=True)
+        cursor.execute("""
+            SELECT direccion FROM like_cancion 
+            WHERE usuario_idusuario = %s
+        """, (usuario_id,))
+        registros = cursor.fetchall()
+        cursor.close()
+        conexion.close()
+
+        direcciones = [reg["direccion"] for reg in registros]
+        return jsonify({"ok": True, "likes": direcciones})
+    except Exception as e:
+        return error_response(f"Error al obtener likes: {str(e)}", 500)
     
     
 # ================== RUN ==================
